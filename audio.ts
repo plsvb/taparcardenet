@@ -33,7 +33,7 @@ class AudioManager {
     }
   }
 
-  // Must be called after a user interaction to comply with browser autoplay policies.
+   policies.
   unlockAudio() {
     if (this.isUnlocked || typeof window === 'undefined') return;
     // Play and immediately pause a sound to "unlock" audio on the browser.
