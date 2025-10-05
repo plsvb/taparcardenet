@@ -62,29 +62,21 @@ const PingPongPage: React.FC = () => {
   const [pointScoredInfo, setPointScoredInfo] = useState<PointInfo | null>(null);
   const [scale, setScale] = useState(1);
   const [isPortrait, setIsPortrait] = useState(window.matchMedia("(orientation: portrait)").matches);
-  const gameWrapperRef = useRef<HTMLDivElement>(null);
   const keysPressed = useRef<{ [key: string]: boolean }>({});
   const animationFrameId = useRef<number>(0);
-  const isTouchDevice = 'ontouchstart' in window;
   const lastTouchPos = useRef<{ [key: number]: Vector2D }>({});
 
   useEffect(() => {
     const handleResize = () => {
       setIsPortrait(window.matchMedia("(orientation: portrait)").matches);
       
-      if (!gameWrapperRef.current) return;
-      const container = gameWrapperRef.current;
-      const availableWidth = container.offsetWidth;
-      const availableHeight = container.offsetHeight;
+      const availableWidth = window.innerWidth;
+      const availableHeight = window.innerHeight;
 
       const scaleX = availableWidth / GAME_WIDTH;
       const scaleY = availableHeight / GAME_HEIGHT;
       
-      let newScale = Math.min(scaleX, scaleY);
-      
-      if (isTouchDevice && !isPortrait) {
-        newScale = scaleX;
-      }
+      const newScale = Math.min(scaleX, scaleY);
       
       setScale(newScale);
     };
@@ -92,7 +84,10 @@ const PingPongPage: React.FC = () => {
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial calculation
     return () => window.removeEventListener('resize', handleResize);
-  }, [isPortrait, isTouchDevice]);
+  }, []);
+
+ 
+
 
   const startGame = useCallback((mode: GameMode) => {
     audioManager.unlockAudio();
@@ -209,7 +204,7 @@ const PingPongPage: React.FC = () => {
   };
 
   const triggerHapticFeedback = (duration: number = 20) => {
-    if (isTouchDevice && 'vibrate' in navigator) {
+    if ('vibrate' in navigator) {
         try {
             navigator.vibrate(duration);
         } catch (e) {
@@ -481,48 +476,29 @@ const PingPongPage: React.FC = () => {
   return (
     <>
       {isPortrait && <RotateDevice />}
-      <div className={`h-screen w-screen bg-gray-900 flex flex-col items-center justify-center font-mono ${isPortrait ? 'hidden' : ''}`}>
-        <div 
-            ref={gameWrapperRef} 
-            className="w-full h-full flex items-center justify-center"
-            style={{
-                alignItems: isTouchDevice ? 'flex-start' : 'center',
-            }}
+      <div className={`h-screen w-screen bg-gray-900 flex items-center justify-center font-mono overflow-hidden ${isPortrait ? 'hidden' : ''}`}>
+        <div
+          style={{
+            position: 'relative',
+            width: `${GAME_WIDTH}px`,
+            height: `${GAME_HEIGHT}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: 'center center',
+          }}
+          onClick={() => {
+              if (gameState.gameStatus === 'playing' && gameState.isServing) {
+                  serveBall();
+              }
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-           <div 
-              style={{
-                  width: `${GAME_WIDTH * scale}px`,
-                  height: `${GAME_HEIGHT * scale}px`,
-                  position: 'relative',
-              }}
-           >
-              <div
-                  style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: `${GAME_WIDTH}px`,
-                      height: `${GAME_HEIGHT}px`,
-                      transform: `scale(${scale})`,
-                      transformOrigin: 'top left',
-                      transition: 'transform 0.1s ease-out',
-                  }}
-                  onClick={() => {
-                      if (gameState.gameStatus === 'playing' && gameState.isServing) {
-                          serveBall();
-                      }
-                  }}
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-              >
-                <div className="relative shadow-2xl shadow-black" style={{width: '100%', height: '100%'}}>
-                   <ScoreBoard score={gameState.score} />
-                   <GameCanvas gameState={gameState} />
-                   {pointScoredInfo && <PointScoredNotification scorer={pointScoredInfo.scorer} score={pointScoredInfo.newScore} reason={pointScoredInfo.reason} />}
-                   {gameState.gameStatus === 'gameOver' && <GameOverScreen winner={getWinnerName()} score={gameState.score} onRestart={() => startGame(gameState.gameMode)} onMainMenu={returnToMenu} />}
-                </div>
-              </div>
+          <div className="relative shadow-2xl shadow-black" style={{width: '100%', height: '100%'}}>
+              <ScoreBoard score={gameState.score} />
+              <GameCanvas gameState={gameState} />
+              {pointScoredInfo && <PointScoredNotification scorer={pointScoredInfo.scorer} score={pointScoredInfo.newScore} reason={pointScoredInfo.reason} />}
+              {gameState.gameStatus === 'gameOver' && <GameOverScreen winner={getWinnerName()} score={gameState.score} onRestart={() => startGame(gameState.gameMode)} onMainMenu={returnToMenu} />}
           </div>
         </div>
       </div>

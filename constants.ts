@@ -1,5 +1,5 @@
 export const GAME_WIDTH = 800;
-export const GAME_HEIGHT = 500;
+export const GAME_HEIGHT = 550;
 
 export const PADDLE_WIDTH = 15;
 export const PADDLE_HEIGHT = 100;
