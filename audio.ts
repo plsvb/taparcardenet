@@ -1,11 +1,11 @@
 // Base64 encoded sound effects for the game.
 // These are short, royalty-free sounds suitable for a web game.
 
-const paddleHitSound = 'assets/ballhit.mp3'
-const tableBounceSound = 'assets/bounce.mp3';
-const pointScoredSound = 'assets/point.mp3';
-const gameOverSound = 'assets/over.mp3';
-const menuClickSound = 'assets/click.mp3'
+const paddleHitSound = 'public/assets/ballhit.mp3'
+const tableBounceSound = 'public/assets/bounce.mp3';
+const pointScoredSound = 'public/assets/point.mp3';
+const gameOverSound = 'public/assets/over.mp3';
+const menuClickSound = 'public/assets/click.mp3'
 
 type SoundEffect = 'paddle_hit' | 'table_bounce' | 'point_scored' | 'game_over' | 'menu_click';
 
