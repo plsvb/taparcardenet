@@ -1,4 +1,4 @@
-// Base64 encoded sound effects for the game.
+// Base64 encoded sound effects for the game..
 // These are short, royalty-free sounds suitable for a web game.
 
 const paddleHitSound = 'public/assets/ballhit.mp3'
